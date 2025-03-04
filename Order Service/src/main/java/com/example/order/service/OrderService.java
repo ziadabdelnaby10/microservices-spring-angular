@@ -1,5 +1,6 @@
 package com.example.order.service;
 
+import com.example.order.client.InventoryClient;
 import com.example.order.mapper.OrderMapper;
 import com.example.order.model.dto.OrderCreateRequest;
 import com.example.order.model.dto.OrderDto;
@@ -20,8 +21,14 @@ import java.util.UUID;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final InventoryClient inventoryClient;
 
     public OrderDto placeOrder(OrderCreateRequest orderDto) {
+        var isProductInStock = inventoryClient.isInStock(orderDto.skuCode() , orderDto.quantity()).getBody();
+
+        if (Boolean.FALSE.equals(isProductInStock))
+            throw new RuntimeException("Product with SkuCode " + orderDto.skuCode() + " is not in stock");
+
         var order = Order.builder()
                 .orderNumber(UUID.randomUUID().toString())
                 .price(orderDto.price())
@@ -30,6 +37,7 @@ public class OrderService {
                 .quantity(orderDto.quantity())
                 .build();
         var savedOrder = orderRepository.save(order);
+
         return orderMapper.toDto(savedOrder);
     }
 

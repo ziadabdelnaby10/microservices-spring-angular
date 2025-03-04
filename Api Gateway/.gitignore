@@ -15,6 +15,7 @@ target/
 
 ### IntelliJ IDEA ###
 .idea
+.mvn
 *.iws
 *.iml
 *.ipr
@@ -31,6 +32,5 @@ build/
 
 ### VS Code ###
 .vscode/
-.mvn
-data
-data/
+docker
+volume-data
