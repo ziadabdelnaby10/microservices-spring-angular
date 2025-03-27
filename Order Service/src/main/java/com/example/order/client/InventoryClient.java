@@ -1,13 +1,23 @@
 package com.example.order.client;
 
-import org.springframework.cloud.openfeign.FeignClient;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.service.annotation.GetExchange;
 
-@FeignClient(value = "inventory" , url = "http://localhost:8082")
 public interface InventoryClient {
-    @RequestMapping(method = RequestMethod.GET , value = "/api/inventory/instock")
-    ResponseEntity<Boolean> isInStock(@RequestParam String skuCode , @RequestParam int quantity);
+
+//    Logger log = LoggerFactory.getLogger(InventoryClient.class);
+
+    @GetExchange("/api/inventory/instock")
+    @CircuitBreaker(name = "inventory", fallbackMethod = "fallbackMethod")
+    @Retry(name = "inventory")
+    ResponseEntity<Boolean> isInStock(@RequestParam String skuCode, @RequestParam int quantity);
+
+    default ResponseEntity<Boolean> fallbackMethod(String code, int quantity, Throwable throwable) {
+        System.out.println("Cannot get inventory for SkuCode " + code + ", failure reason " + throwable.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+    }
 }
