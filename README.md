@@ -1,5 +1,5 @@
 
-```markdown
+
 # 🛠️ Microservices with Spring Boot and Angular
 
 This project is a Spring Boot-based microservices architecture, designed to build scalable and resilient applications. It utilizes **Spring Cloud**, **Spring Data JPA**, and integrates tools for logging, monitoring, and API documentation. The frontend is built using **Angular** to provide a seamless user interface. The project is focused on leveraging Spring Boot features for backend services.
